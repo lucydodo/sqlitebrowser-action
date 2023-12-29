@@ -61,9 +61,8 @@
                         <Component><File Source="$(var.QtPath)\plugins\bearer\qgenericbearer.dll" /></Component>
                     </Directory>
                     <Directory Id="extensions" Name="extensions">
-                        <Component><File Source="$(var.SQLitePath)\math.dll" /></Component>
                         <Component><File Source="$(var.SQLitePath)\formats.dll" /></Component>
-                        <Component><File Source="$(var.SQLitePath)\fileio.dll" /></Component>
+                        <Component><File Source="$(var.SQLitePath)\sqlean.dll" /></Component>
                     </Directory>
                     <Directory Id="imageformats" Name="imageformats">
                         <Component><File Source="$(var.QtPath)\plugins\imageformats\qgif.dll" /></Component>
@@ -143,14 +142,11 @@
             </Feature>
 
             <Feature Id="Extensions" Title="SQLite Extensions" Description="SQLite runtime loadable extensions" AllowAdvertise="no" Display="expand">
-                <Feature Id="MathExtension" Title="Math" Description="Provide mathematical and string extension functions for SQL queries." AllowAdvertise="no">
-                    <ComponentRef Id="math.dll" />
-                </Feature>
                 <Feature Id="FormatsExtension" Title="Formats" Description="Provide additional field display formats." AllowAdvertise="no">
                     <ComponentRef Id="formats.dll" />
                 </Feature>
-                <Feature Id="FileioExtension" Title="Fileio" Description="Implements SQL functions readfile(), writefile(), and eponymous virtual type 'fsdir'." AllowAdvertise="no">
-                    <ComponentRef Id="fileio.dll" />
+                <Feature Id="FileioExtension" Title="nalgeon/sqlean" Description="All the Missing SQLite Functions by nalgeon/sqlean" AllowAdvertise="no">
+                    <ComponentRef Id="sqlean.dll" />
                 </Feature>
             </Feature>
 

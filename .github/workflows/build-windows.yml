@@ -28,8 +28,8 @@ jobs:
       - name: Clear SQLite and temp files
         continue-on-error: true
         run: |
-          rm -r C:\temp\${{ matrix.arch }}\*
-          rm -r C:\dev\SQLite-${{ matrix.arch }}
+          rm -r C:\temp\${{ matrix.arch }}\* -Force
+          rm -r C:\dev\SQLite-${{ matrix.arch }} -Force
 
       - name: Install SQLite
         run: |
@@ -44,21 +44,24 @@ jobs:
           cd C:\dev\SQLite-${{ matrix.arch }}
           cl sqlite3.c -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS -DSQLITE_ENABLE_STAT4 -DSQLITE_SOUNDEX -DSQLITE_ENABLE_JSON1 -DSQLITE_ENABLE_GEOPOLY -DSQLITE_ENABLE_RTREE -DSQLITE_ENABLE_MATH_FUNCTIONS -DSQLITE_MAX_ATTACHED=125 -DSQLITE_API="__declspec(dllexport)" -link -dll -out:sqlite3.dll
 
+      - name: Build the 'nalgeon/sqlean' extension
+        run: |
+          cd C:\temp\${{ matrix.arch }}\
+          git clone https://github.com/nalgeon/sqlean
+          cd sqlean
+          git reset --hard $(git describe --tags --abbrev=0)
+          make V=1 prepare-dist
+          make V=1 download-sqlite
+          make V=1 download-external
+          make V=1 compile-windows
+          cp dist/sqlean.dll C:\dev\SQLite-${{ matrix.arch }}\
+
       - name: Install SQLite Extensions
         run: |
           cp .\src\extensions\extension-formats.c C:\dev\SQLite-${{ matrix.arch}}\
           cp .\src\extensions\extension-formats.def C:\dev\SQLite-${{ matrix.arch}}\
-          cp .\src\extensions\extension-functions.c C:\dev\SQLite-${{ matrix.arch}}\
-          cp .\src\extensions\extension-functions.def C:\dev\SQLite-${{ matrix.arch}}\
           cd C:\dev\SQLite-${{ matrix.arch}}\
           cl /MD extension-formats.c -link -dll -def:extension-formats.def -out:formats.dll
-          cl /MD extension-functions.c -link -dll -def:extension-functions.def -out:math.dll
-          # FIXME: Disable building the 'fileio' extension for now (#3488)
-          # If this issue is resolved, be sure to delete the related patch for WiX
-          # curl -L -o fileio.c "https://sqlite.org/src/raw?filename=ext/misc/fileio.c&ci=trunk"
-          # curl -L -o test_windirent.c "https://sqlite.org/src/raw?filename=src/test_windirent.c&ci=trunk"
-          # curl -L -o test_windirent.h "https://sqlite.org/src/raw?filename=src/test_windirent.h&ci=trunk"
-          # cl /MD fileio.c test_windirent.c -link sqlite3.lib -dll -out:fileio.dll
 
       - name: Install SQLCipher
         env:
